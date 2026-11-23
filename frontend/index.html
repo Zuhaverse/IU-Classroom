@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IU Learning Classroom - Voice-Powered Education Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header h1 {
+            color: #fff;
+            font-size: 2em;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .classroom-info {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .status.connected {
+            background: #27ae60;
+            color: white;
+        }
+
+        .status.disconnected {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .classroom-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 1200px) {
+            .classroom-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .card h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 3px solid #4a90e2;
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .teacher-zone {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #4a90e2;
+        }
+
+        .student-zone {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        }
+
+        .sidebar-card {
+            background: white;
+        }
+
+        .lesson-area {
+            border: 2px dashed #4a90e2;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f0f7ff;
+            min-height: 200px;
+        }
+
+        .lesson-area:hover {
+            border-color: #2c3e50;
+            background: #e3f2fd;
+        }
+
+        .lesson-area.active {
+            border-color: #27ae60;
+            background: #d4edda;
+        }
+
+        .lesson-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a90e2, #27ae60);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-teacher {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .btn-student {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .transcript-container {
+            max-height: 400px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .transcript-segment {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .transcript-segment .speaker {
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 5px;
+            padding: 4px 12px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .transcript-segment .speaker.teacher {
+            background: #ffe6e6;
+            color: #e74c3c;
+        }
+
+        .transcript-segment .speaker.student {
+            background: #d4edda;
+            color: #27ae60;
+        }
+
+        .transcript-segment .speaker.dentist {
+            background: #ffe6e6;
+            color: #e74c3c;
+        }
+
+        .transcript-segment .speaker.patient {
+            background: #d4edda;
+            color: #27ae60;
+        }
+
+        .transcript-segment .time {
+            color: #999;
+            font-size: 0.85em;
+        }
+
+        .transcript-segment .text {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .transcript-segment .confidence {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .speaker-list {
+            list-style: none;
+        }
+
+        .speaker-item {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .speaker-item.teacher-role {
+            border-left-color: #e74c3c;
+            background: #fff5f5;
+        }
+
+        .speaker-item.student-role {
+            border-left-color: #27ae60;
+            background: #f0fff4;
+        }
+
+        .speaker-name {
+            font-weight: bold;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .speaker-badge {
+            background: #4a90e2;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .teacher-badge {
+            background: #e74c3c;
+        }
+
+        .student-badge {
+            background: #27ae60;
+        }
+
+        .assignment-card {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .assignment-card:hover {
+            border-color: #4a90e2;
+            box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2);
+        }
+
+        .assignment-card.completed {
+            border-color: #27ae60;
+            background: #f0fff4;
+        }
+
+        .assignment-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .assignment-meta {
+            font-size: 0.85em;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+
+        .participation-meter {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .meter-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a90e2, #27ae60);
+            transition: width 0.3s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .stat-box:hover {
+            border-color: #4a90e2;
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .achievement-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin: 3px;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .recording-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #dc3545;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        #exportBtn {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1>
+                    <span>🎓</span>
+                    <span>IU Learning Classroom</span>
+                </h1>
+                <div class="classroom-info">
+                    Interactive Voice-Powered Education Platform
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-badge">
+                    <span>👤</span>
+                    <span id="userRole">Student</span>
+                </div>
+                <div id="serverStatus" class="status disconnected">Connecting...</div>
+            </div>
+        </div>
+
+        <!-- Role Selector -->
+        <div class="card" style="margin-bottom: 15px;">
+            <h2>🎭 Select Your Role</h2>
+            <div style="text-align: center;">
+                <button class="btn btn-teacher" id="roleTeacher">
+                    👨‍🏫 I'm a Teacher
+                </button>
+                <button class="btn btn-student" id="roleStudent">
+                    👨‍🎓 I'm a Student
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Classroom Layout -->
+        <div class="classroom-layout">
+            <!-- Left Sidebar: Class Participants -->
+            <div>
+                <div class="card sidebar-card">
+                    <h2>👥 Class Roster</h2>
+                    <div id="classRoster">
+                        <div class="empty-state" style="padding: 20px;">
+                            <div style="font-size: 2em; margin-bottom: 10px;">👥</div>
+                            <p style="font-size: 0.9em;">No participants yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card sidebar-card" style="margin-top: 15px;">
+                    <h2>🏆 Progress</h2>
+                    <div class="participation-meter">
+                        <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Session Progress</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="sessionProgress" style="width: 0%;">0%</div>
+                        </div>
+                    </div>
+                    <div class="stats-grid" style="grid-template-columns: 1fr;">
+                        <div class="stat-box">
+                            <div class="stat-value" id="participationScore">0</div>
+                            <div class="stat-label">Participation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center: Main Teaching/Learning Area -->
+            <div>
+                <div class="card teacher-zone" id="teacherZone">
+                    <h2>👨‍🏫 Teacher's Desk</h2>
+                <div class="card teacher-zone" id="teacherZone">
+                    <h2>👨‍🏫 Teacher's Desk</h2>
+                    
+                    <!-- Lesson Control -->
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <button class="btn btn-primary" id="modeFile">
+                            📁 Upload Lesson Audio
+                        </button>
+                        <button class="btn" id="modeMic" style="background: #6c757d; color: white;">
+                            🎙️ Start Live Lesson
+                        </button>
+                    </div>
+
+                    <!-- File Upload Section -->
+                    <div id="fileSection">
+                        <div id="uploadArea" class="lesson-area">
+                            <div class="lesson-icon">📚</div>
+                            <p><strong>Upload Lesson Recording</strong></p>
+                            <p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                                Click or drag and drop audio file
+                            </p>
+                            <p style="color: #999; font-size: 0.85em; margin-top: 8px;">
+                                Supported: WAV, MP3, M4A, FLAC
+                            </p>
+                        </div>
+                        <input type="file" id="fileInput" accept=".wav,.mp3,.m4a,.flac">
+                        
+                        <div class="controls">
+                            <button class="btn btn-primary" id="processBtn" disabled>
+                                🎯 Analyze Lesson
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Microphone Section -->
+                    <div id="micSection" style="display: none;">
+                        <div class="lesson-area active">
+                            <div id="micStatus" style="font-size: 1.1em; margin-bottom: 15px; color: #2c3e50;">
+                                🎤 Ready for Live Lesson
+                            </div>
+                            <div id="recordingTime" style="font-size: 2.5em; font-weight: bold; color: #4a90e2; margin-bottom: 15px;">
+                                00:00
+                            </div>
+                            <div id="debugInfo" style="font-size: 0.85em; color: #666; margin-bottom: 10px; min-height: 20px;">
+                                <!-- Debug info will appear here -->
+                            </div>
+                            <button class="btn btn-danger" id="recordBtn" style="font-size: 1.1em; padding: 12px 35px;">
+                                ⏺️ Start Recording
+                            </button>
+                            <button class="btn" id="stopRecordBtn" style="font-size: 1.1em; padding: 12px 35px; background: #6c757d; color: white; display: none;">
+                                ⏹️ Stop Recording
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="alerts"></div>
+                    
+                    <div class="controls">
+                        <button class="btn btn-success" id="exportBtn" disabled>
+                            💾 Export Transcript
+                        </button>
+                        <button class="btn btn-primary" id="shareBtn" disabled>
+                            📤 Share with Students
+                        </button>
+                    </div>
+
+                    <div id="loadingIndicator" class="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Analyzing lesson audio... Please wait.</p>
+                    </div>
+
+                    <!-- Classroom Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-value" id="segmentCount">0</div>
+                            <div class="stat-label">Exchanges</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="speakerCount">0</div>
+                            <div class="stat-label">Participants</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="duration">0s</div>
+                            <div class="stat-label">Duration</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Learning Zone -->
+                <div class="card student-zone" style="margin-top: 15px;">
+                    <h2>👨‍🎓 Student Learning Area</h2>
+                    <div id="studentArea">
+                        <div class="lesson-area">
+                            <div class="lesson-icon">📖</div>
+                            <p><strong>Welcome to the Classroom!</strong></p>
+                            <p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                                Listen to lessons, practice speaking, and track your progress
+                            </p>
+                        </div>
+                        
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-student" id="studentPracticeBtn" disabled>
+                                🎤 Practice Speaking
+                            </button>
+                            <button class="btn btn-primary" id="studentReviewBtn" disabled>
+                                📝 Review Lesson
+                            </button>
+                        </div>
+                        
+                        <div class="participation-meter" style="margin-top: 15px;">
+                            <div style="font-size: 0.9em; font-weight: 600; color: #2c3e50; margin-bottom: 8px;">
+                                Your Learning Progress
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="studentProgress" style="width: 0%;">0%</div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.85em; color: #666;">
+                                <span>Just Started</span>
+                                <span>Mastered</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar: Assignments & Resources -->
+            <div>
+                <div class="card sidebar-card">
+                    <h2>📋 Today's Assignments</h2>
+                    <div id="assignmentsList">
+                        <div class="assignment-card">
+                            <div class="assignment-title">🎯 Lesson 1: Patient Consultation Basics</div>
+                            <div style="font-size: 0.85em; color: #666; margin-top: 5px;">
+                                Learn proper patient greeting and initial assessment
+                            </div>
+                            <div class="assignment-meta">
+                                <span>Due: Today</span>
+                                <span style="color: #f39c12; font-weight: 600;">Pending</span>
+                            </div>
+                        </div>
+                        
+                        <div class="assignment-card">
+                            <div class="assignment-title">📝 Practice: Professional Vocabulary</div>
+                            <div style="font-size: 0.85em; color: #666; margin-top: 5px;">
+                                Record yourself using 10 key professional terms
+                            </div>
+                            <div class="assignment-meta">
+                                <span>Due: Tomorrow</span>
+                                <span style="color: #e74c3c; font-weight: 600;">Not Started</span>
+                            </div>
+                        </div>
+                        
+                        <div class="assignment-card completed">
+                            <div class="assignment-title">✅ Review: Voice Recognition Accuracy</div>
+                            <div style="font-size: 0.85em; color: #666; margin-top: 5px;">
+                                Complete voice calibration exercise
+                            </div>
+                            <div class="assignment-meta">
+                                <span>Completed</span>
+                                <span style="color: #27ae60; font-weight: 600;">100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card sidebar-card" style="margin-top: 15px;">
+                    <h2>🎓 Learning Resources</h2>
+                    <div style="padding: 10px;">
+                        <div class="achievement-badge">📖 Study Guide</div>
+                        <div class="achievement-badge">🎥 Video Lessons</div>
+                        <div class="achievement-badge">🎤 Practice Audio</div>
+                        <div class="achievement-badge">📊 Quiz Bank</div>
+                    </div>
+                    
+                    <div style="margin-top: 15px; padding: 12px; background: #fff3cd; border-radius: 8px; border: 1px solid #ffc107; font-size: 0.85em;">
+                        <strong>💡 Tip:</strong> Practice regularly to improve your speaking confidence and recognition accuracy!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Transcript Board -->
+        <div class="card">
+            <h2>💬 Class Discussion Board</h2>
+            <div id="transcriptContainer" class="transcript-container">
+                <div class="empty-state">
+                    <div class="empty-state-icon">💭</div>
+                    <p>Start a lesson to see the conversation transcript here</p>
+                    <p style="font-size: 0.85em; color: #666; margin-top: 10px;">
+                        Teacher and student interactions will appear with speaker identification
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = window.location.origin;
+        const WS_BASE = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`;
+        
+        // State
+        let selectedFile = null;
+        let currentTranscript = [];
+        let isRecording = false;
+        let mediaRecorder = null;
+        let audioContext = null;
+        let websocket = null;
+        let recordingStartTime = null;
+        let recordingInterval = null;
+        let audioChunks = [];
+        let currentMode = 'file'; // 'file' or 'mic'
+        let currentRole = 'student'; // 'teacher' or 'student'
+        let classParticipants = [];
+        let sessionProgress = 0;
+
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const processBtn = document.getElementById('processBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const transcriptContainer = document.getElementById('transcriptContainer');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const alerts = document.getElementById('alerts');
+        const serverStatus = document.getElementById('serverStatus');
+        const modeFile = document.getElementById('modeFile');
+        const modeMic = document.getElementById('modeMic');
+        const fileSection = document.getElementById('fileSection');
+        const micSection = document.getElementById('micSection');
+        const recordBtn = document.getElementById('recordBtn');
+        const stopRecordBtn = document.getElementById('stopRecordBtn');
+        const micStatus = document.getElementById('micStatus');
+        const recordingTime = document.getElementById('recordingTime');
+        const roleTeacher = document.getElementById('roleTeacher');
+        const roleStudent = document.getElementById('roleStudent');
+        const userRole = document.getElementById('userRole');
+        const classRoster = document.getElementById('classRoster');
+        const studentPracticeBtn = document.getElementById('studentPracticeBtn');
+        const studentReviewBtn = document.getElementById('studentReviewBtn');
+        const debugInfo = document.getElementById('debugInfo');
+
+        // Role Selection
+        roleTeacher.addEventListener('click', () => {
+            currentRole = 'teacher';
+            userRole.textContent = 'Teacher';
+            roleTeacher.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+            roleStudent.style.background = '#6c757d';
+            showAlert('You are now in Teacher mode. Start a lesson!', 'success');
+            updateClassroomUI();
+        });
+
+        roleStudent.addEventListener('click', () => {
+            currentRole = 'student';
+            userRole.textContent = 'Student';
+            roleStudent.style.background = 'linear-gradient(135deg, #27ae60 0%, #229954 100%)';
+            roleTeacher.style.background = '#6c757d';
+            showAlert('You are now in Student mode. Ready to learn!', 'success');
+            updateClassroomUI();
+        });
+
+        function updateClassroomUI() {
+            if (currentRole === 'teacher') {
+                studentPracticeBtn.disabled = true;
+                studentReviewBtn.disabled = true;
+            } else {
+                studentPracticeBtn.disabled = false;
+                studentReviewBtn.disabled = false;
+            }
+        }
+
+        // Mode switching
+        modeFile.addEventListener('click', () => {
+            currentMode = 'file';
+            fileSection.style.display = 'block';
+            micSection.style.display = 'none';
+            modeFile.style.background = 'linear-gradient(135deg, #4a90e2 0%, #357abd 100%)';
+            modeFile.style.color = 'white';
+            modeMic.style.background = '#6c757d';
+            modeMic.style.color = 'white';
+            if (isRecording) stopRecording();
+        });
+
+        modeMic.addEventListener('click', () => {
+            currentMode = 'mic';
+            fileSection.style.display = 'none';
+            micSection.style.display = 'block';
+            modeMic.style.background = 'linear-gradient(135deg, #4a90e2 0%, #357abd 100%)';
+            modeMic.style.color = 'white';
+            modeFile.style.background = '#6c757d';
+            modeFile.style.color = 'white';
+        });
+
+        // Update class roster
+        function updateClassRoster() {
+            if (classParticipants.length === 0) {
+                classRoster.innerHTML = `
+                    <div class="empty-state" style="padding: 20px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">👥</div>
+                        <p style="font-size: 0.9em;">No participants yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            classRoster.innerHTML = '';
+            classParticipants.forEach(participant => {
+                const item = document.createElement('div');
+                item.className = `speaker-item ${participant.role}-role`;
+                const badgeClass = participant.role === 'teacher' ? 'teacher-badge' : 'student-badge';
+                const icon = participant.role === 'teacher' ? '👨‍🏫' : '👨‍🎓';
+                
+                item.innerHTML = `
+                    <div class="speaker-name">
+                        <span>${icon}</span>
+                        <span>${participant.name}</span>
+                    </div>
+                    <span class="speaker-badge ${badgeClass}">${participant.role}</span>
+                `;
+                classRoster.appendChild(item);
+            });
+        }
+
+        // Check server status
+        async function checkServerStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    serverStatus.textContent = '✅ Connected';
+                    serverStatus.className = 'status connected';
+                } else {
+                    throw new Error('Server not responding');
+                }
+            } catch (error) {
+                serverStatus.textContent = '❌ Offline';
+                serverStatus.className = 'status disconnected';
+                showAlert('Cannot connect to server. Please check if it\'s running.', 'error');
+            }
+        }
+
+        // Update session progress
+        function updateSessionProgress() {
+            if (currentTranscript.length > 0) {
+                sessionProgress = Math.min(100, currentTranscript.length * 10);
+                document.getElementById('sessionProgress').style.width = sessionProgress + '%';
+                document.getElementById('sessionProgress').textContent = sessionProgress + '%';
+                document.getElementById('studentProgress').style.width = sessionProgress + '%';
+                document.getElementById('studentProgress').textContent = sessionProgress + '%';
+                document.getElementById('participationScore').textContent = currentTranscript.length;
+            }
+        }
+
+        // Show alert
+        function showAlert(message, type = 'info') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alerts.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Upload area drag and drop
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragging');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragging');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragging');
+            
+            if (e.dataTransfer.files.length > 0) {
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        // Handle file selection
+        function handleFileSelect(file) {
+            const validExtensions = ['.wav', '.mp3', '.m4a', '.flac'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            
+            if (!validExtensions.includes(fileExtension)) {
+                showAlert('Invalid file type. Please upload WAV, MP3, M4A, or FLAC.', 'error');
+                return;
+            }
+
+            selectedFile = file;
+            uploadArea.innerHTML = `
+                <div class="lesson-icon">✅</div>
+                <p><strong>${file.name}</strong></p>
+                <p style="color: #666; font-size: 0.9em;">
+                    ${(file.size / 1024 / 1024).toFixed(2)} MB - Ready to analyze
+                </p>
+            `;
+            uploadArea.classList.add('active');
+            processBtn.disabled = false;
+            showAlert('Lesson audio selected! Click "Analyze Lesson" to process.', 'success');
+        }
+
+        // Process audio
+        processBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            processBtn.disabled = true;
+            exportBtn.disabled = true;
+            shareBtn.disabled = true;
+            loadingIndicator.style.display = 'block';
+            transcriptContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing classroom discussion...</p></div>';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch(`${API_BASE}/process`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                displayTranscript(result.segments);
+                updateStats(result.segments);
+                updateSessionProgress();
+                
+                // Extract participants from transcript
+                extractParticipants(result.segments);
+                
+                showAlert('Lesson analysis complete! Review the transcript below.', 'success');
+                exportBtn.disabled = false;
+                shareBtn.disabled = false;
+                studentReviewBtn.disabled = false;
+
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert(`Error analyzing lesson: ${error.message}`, 'error');
+                transcriptContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <p>Error processing audio</p>
+                        <p style="color: #e74c3c; font-size: 0.9em; margin-top: 10px;">${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                loadingIndicator.style.display = 'none';
+                processBtn.disabled = false;
+            }
+        });
+
+        // Extract participants from segments
+        function extractParticipants(segments) {
+            classParticipants = [];
+            const uniqueSpeakers = new Set();
+            
+            segments.forEach(segment => {
+                const speaker = segment.speaker_id || segment.speaker || 'Unknown';
+                if (!uniqueSpeakers.has(speaker)) {
+                    uniqueSpeakers.add(speaker);
+                    const role = speaker.toLowerCase().includes('dentist') || speaker.toLowerCase().includes('teacher') 
+                        ? 'teacher' 
+                        : 'student';
+                    classParticipants.push({
+                        name: speaker,
+                        role: role
+                    });
+                }
+            });
+            
+            updateClassRoster();
+        }
+
+        // Display transcript
+        function displayTranscript(segments) {
+            if (!segments || segments.length === 0) {
+                transcriptContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔇</div>
+                        <p>No speech detected in audio</p>
+                    </div>
+                `;
+                return;
+            }
+
+            currentTranscript = segments;
+            transcriptContainer.innerHTML = '';
+
+            segments.forEach((segment, index) => {
+                const segmentDiv = document.createElement('div');
+                segmentDiv.className = 'transcript-segment';
+                
+                const speakerName = segment.speaker_id || segment.speaker || 'Unknown';
+                const speakerClass = speakerName.toLowerCase().includes('dentist') || speakerName.toLowerCase().includes('teacher')
+                    ? 'teacher'
+                    : speakerName.toLowerCase().includes('patient') || speakerName.toLowerCase().includes('student')
+                    ? 'student'
+                    : 'unknown';
+                
+                const confidence = (segment.score || segment.speaker_confidence || 0).toFixed(2);
+                const roleIcon = speakerClass === 'teacher' ? '👨‍🏫' : speakerClass === 'student' ? '👨‍🎓' : '👤';
+                
+                segmentDiv.innerHTML = `
+                    <div class="speaker ${speakerClass}">${roleIcon} ${speakerName}</div>
+                    <div class="time">⏱️ ${formatTime(segment.start)} - ${formatTime(segment.end)}</div>
+                    <div class="text">${segment.text || '(no transcription)'}</div>
+                    <div class="confidence">✓ Confidence: ${(confidence * 100).toFixed(0)}%</div>
+                `;
+                
+                transcriptContainer.appendChild(segmentDiv);
+            });
+        }
+
+        // Update statistics
+        function updateStats(segments) {
+            const segmentCount = segments.length;
+            const speakers = new Set(
+                segments.map(s => (s.speaker || s.speaker_id || 'Unknown'))
+            );
+            const maxTime = Math.max(...segments.map(s => s.end || s.finish || 0));
+
+            document.getElementById('segmentCount').textContent = segmentCount;
+            document.getElementById('speakerCount').textContent = speakers.size;
+            document.getElementById('duration').textContent = formatTime(maxTime);
+        }
+
+        // Format time
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Student practice button
+        studentPracticeBtn.addEventListener('click', () => {
+            showAlert('Starting practice mode... Speak clearly!', 'info');
+            modeMic.click();
+        });
+
+        // Student review button
+        studentReviewBtn.addEventListener('click', () => {
+            showAlert('Review the lesson transcript below', 'info');
+            transcriptContainer.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Share button
+        shareBtn.addEventListener('click', () => {
+            showAlert('Transcript shared with all students in the class!', 'success');
+        });
+
+        // Microphone recording functions
+        recordBtn.addEventListener('click', startRecording);
+        stopRecordBtn.addEventListener('click', stopRecording);
+
+        async function startRecording() {
+            try {
+                // Request microphone access
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        channelCount: 1,
+                        sampleRate: 16000,
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    } 
+                });
+
+                // Clear previous transcript
+                currentTranscript = [];
+                transcriptContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎙️</div><p>Listening... Speak now</p></div>';
+                updateStats([]);
+
+                // Setup WebSocket connection
+                websocket = new WebSocket(`${WS_BASE}/ws/stream?mode=single`);
+
+                websocket.onopen = () => {
+                    console.log('🟢 WebSocket connected successfully!');
+                    micStatus.innerHTML = '<span class="recording-indicator"></span>Recording in progress...';
+                    debugInfo.innerHTML = '✅ Connected to server | 🎤 Listening for speech...';
+                    showAlert('Recording started! Speak clearly into your microphone.', 'success');
+                };
+
+                websocket.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    console.log('🔔 WebSocket Message Received:', data.type, data);
+
+                    if (data.type === 'connection') {
+                        console.log('✅ Connection confirmed:', data.session_id);
+                        debugInfo.innerHTML = `✅ Session ${data.session_id.substring(0, 8)}... | 🎤 Ready to record`;
+                    } else if (data.type === 'transcript') {
+                        console.log('📝 Transcript received:', data.data);
+                        debugInfo.innerHTML = `📝 Processing: ${data.data.speaker || 'Speaker'} | "${data.data.text?.substring(0, 30)}..."`;
+                        addRealtimeSegment(data.data);
+                        updateSessionProgress();
+                    } else if (data.type === 'finalization') {
+                        console.log('🏁 Finalization received:', data.data);
+                        debugInfo.innerHTML = `🏁 Session finalized | ${data.data.speaker_count} speakers detected`;
+                        handleFinalization(data.data);
+                        updateSessionProgress();
+                    } else if (data.type === 'error') {
+                        console.error('❌ Server error:', data.message);
+                        debugInfo.innerHTML = `❌ Error: ${data.message}`;
+                        showAlert(`Error: ${data.message}`, 'error');
+                    } else {
+                        console.log('❓ Unknown message type:', data.type, data);
+                    }
+                };
+
+                websocket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    showAlert('WebSocket connection error', 'error');
+                    stopRecording();
+                };
+
+                websocket.onclose = () => {
+                    console.log('WebSocket closed');
+                };
+
+                // Setup audio processing
+                audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                    sampleRate: 16000
+                });
+                const source = audioContext.createMediaStreamSource(stream);
+                const processor = audioContext.createScriptProcessor(4096, 1, 1);
+
+                // VAD requires 512 samples per chunk at 16kHz
+                const VAD_CHUNK_SIZE = 512;
+                let audioBuffer = [];
+                let chunkCount = 0;
+
+                processor.onaudioprocess = (e) => {
+                    if (websocket && websocket.readyState === WebSocket.OPEN) {
+                        const inputData = e.inputBuffer.getChannelData(0);
+                        
+                        // Add to buffer
+                        audioBuffer.push(...inputData);
+                        
+                        // Send in 512-sample chunks
+                        while (audioBuffer.length >= VAD_CHUNK_SIZE) {
+                            const chunk = audioBuffer.splice(0, VAD_CHUNK_SIZE);
+                            
+                            // Calculate RMS for audio level monitoring
+                            const rms = Math.sqrt(chunk.reduce((sum, val) => sum + val * val, 0) / chunk.length);
+                            
+                            // Log audio level periodically
+                            chunkCount++;
+                            if (chunkCount % 50 === 0) {  // Log every 50 chunks
+                                console.log(`🎤 Audio chunk ${chunkCount}: RMS = ${rms.toFixed(4)}, Buffer size = ${audioBuffer.length}`);
+                            }
+                            
+                            // Convert float32 to int16
+                            const int16Data = new Int16Array(VAD_CHUNK_SIZE);
+                            for (let i = 0; i < VAD_CHUNK_SIZE; i++) {
+                                int16Data[i] = Math.max(-32768, Math.min(32767, chunk[i] * 32768));
+                            }
+                            websocket.send(int16Data.buffer);
+                        }
+                    }
+                };
+
+                source.connect(processor);
+                processor.connect(audioContext.destination);
+
+                // Update UI
+                isRecording = true;
+                recordBtn.style.display = 'none';
+                stopRecordBtn.style.display = 'inline-block';
+                exportBtn.disabled = true;
+
+                // Start timer
+                recordingStartTime = Date.now();
+                recordingInterval = setInterval(updateRecordingTime, 1000);
+
+                // Store references for cleanup
+                window.currentStream = stream;
+                window.currentProcessor = processor;
+
+            } catch (error) {
+                console.error('Error starting recording:', error);
+                showAlert(`Microphone access denied or error: ${error.message}`, 'error');
+            }
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            
+            // Stop timer
+            if (recordingInterval) {
+                clearInterval(recordingInterval);
+                recordingInterval = null;
+            }
+
+            // Close WebSocket
+            if (websocket) {
+                websocket.close();
+                websocket = null;
+            }
+
+            // Stop audio context
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+
+            // Stop processor
+            if (window.currentProcessor) {
+                window.currentProcessor.disconnect();
+                window.currentProcessor = null;
+            }
+
+            // Stop all tracks
+            if (window.currentStream) {
+                window.currentStream.getTracks().forEach(track => track.stop());
+                window.currentStream = null;
+            }
+
+            // Update UI
+            recordBtn.style.display = 'inline-block';
+            stopRecordBtn.style.display = 'none';
+            micStatus.textContent = 'Recording stopped';
+            recordingTime.textContent = '00:00';
+            exportBtn.disabled = currentTranscript.length === 0;
+
+            showAlert('Recording stopped. Transcript is ready!', 'info');
+        }
+
+        function updateRecordingTime() {
+            if (!recordingStartTime) return;
+            const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const mins = Math.floor(elapsed / 60);
+            const secs = elapsed % 60;
+            recordingTime.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function handleFinalization(data) {
+            console.log('Handling finalization:', data);
+            
+            // Replace current transcript with finalized segments
+            if (data.segments && data.segments.length > 0) {
+                currentTranscript = data.segments;
+                
+                // Clear and rebuild transcript display
+                transcriptContainer.innerHTML = '';
+                
+                data.segments.forEach(segment => {
+                    const segmentDiv = document.createElement('div');
+                    segmentDiv.className = 'transcript-segment';
+                    
+                    const speakerName = segment.speaker || segment.speaker_id || 'Speaker';
+                    const speakerClass = speakerName.toLowerCase().includes('dentist') || speakerName.toLowerCase().includes('teacher')
+                        ? 'teacher'
+                        : speakerName.toLowerCase().includes('patient') || speakerName.toLowerCase().includes('student')
+                        ? 'student'
+                        : 'unknown';
+                    
+                    const confidence = (segment.score || segment.speaker_confidence || 0);
+                    const roleIcon = speakerClass === 'teacher' ? '👨‍🏫' : speakerClass === 'student' ? '👨‍🎓' : '👤';
+                    
+                    segmentDiv.innerHTML = `
+                        <div class="speaker ${speakerClass}">${roleIcon} ${speakerName}</div>
+                        <div class="time">⏱️ ${formatTime(segment.start)} - ${formatTime(segment.end)}</div>
+                        <div class="text">${segment.text || '(processing...)'}</div>
+                        <div class="confidence">✓ Confidence: ${(confidence * 100).toFixed(0)}%</div>
+                    `;
+                    
+                    transcriptContainer.appendChild(segmentDiv);
+                });
+                
+                transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+                
+                // Update stats with final speaker count
+                updateStats(currentTranscript);
+                extractParticipants(currentTranscript);
+                
+                // Show finalization notification
+                showAlert(`Lesson completed: ${data.speaker_count} participant(s) detected`, 'success');
+            }
+        }
+
+        function addRealtimeSegment(segment) {
+            // Add to transcript array
+            currentTranscript.push(segment);
+
+            // Update display
+            if (transcriptContainer.querySelector('.empty-state')) {
+                transcriptContainer.innerHTML = '';
+            }
+
+            const segmentDiv = document.createElement('div');
+            segmentDiv.className = 'transcript-segment';
+            
+            const speakerName = segment.speaker || segment.speaker_id || 'Speaker';
+            const speakerClass = speakerName.toLowerCase().includes('dentist') || speakerName.toLowerCase().includes('teacher')
+                ? 'teacher'
+                : speakerName.toLowerCase().includes('patient') || speakerName.toLowerCase().includes('student')
+                ? 'student'
+                : 'unknown';
+            
+            const confidence = (segment.score || segment.speaker_confidence || 0);
+            const roleIcon = speakerClass === 'teacher' ? '👨‍🏫' : speakerClass === 'student' ? '👨‍🎓' : '👤';
+            
+            // Add visual indicator for fresh segments
+            segmentDiv.style.animation = 'slideIn 0.3s ease-out';
+            
+            segmentDiv.innerHTML = `
+                <div class="speaker ${speakerClass}">${roleIcon} ${speakerName}</div>
+                <div class="time">⏱️ ${formatTime(segment.start)} - ${formatTime(segment.end)}</div>
+                <div class="text">${segment.text || '(processing...)'}</div>
+                <div class="confidence">✓ Confidence: ${(confidence * 100).toFixed(0)}%</div>
+            `;
+            
+            transcriptContainer.appendChild(segmentDiv);
+            transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+
+            // Update stats
+            updateStats(currentTranscript);
+        }
+
+        // Export transcript
+        exportBtn.addEventListener('click', () => {
+            if (currentTranscript.length === 0) return;
+
+            let exportText = '=== IU Learning Classroom - Session Transcript ===\n\n';
+            exportText += `Date: ${new Date().toLocaleString()}\n`;
+            exportText += `Total Exchanges: ${currentTranscript.length}\n`;
+            exportText += `Participants: ${classParticipants.map(p => `${p.name} (${p.role})`).join(', ')}\n\n`;
+            exportText += '='.repeat(50) + '\n\n';
+            
+            currentTranscript.forEach((segment, index) => {
+                const speaker = segment.speaker_id || segment.speaker || 'Unknown';
+                const time = `${formatTime(segment.start)} - ${formatTime(segment.end)}`;
+                const text = segment.text || '(no transcription)';
+                const confidence = ((segment.score || segment.speaker_confidence || 0) * 100).toFixed(0);
+                
+                exportText += `[${time}] ${speaker} (${confidence}% confidence):\n${text}\n\n`;
+            });
+
+            const blob = new Blob([exportText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `classroom_transcript_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showAlert('Classroom transcript exported successfully!', 'success');
+        });
+
+        // Initialize
+        checkServerStatus();
+        setInterval(checkServerStatus, 30000); // Check every 30 seconds
+        updateClassroomUI();
+    </script>
+</body>
+</html>
